@@ -1,0 +1,34 @@
+import pandas as pd
+
+df = pd.read_csv("student_results_gini_gain.csv")
+print(df)
+
+parent_counts = df["Result"].value_counts()
+parent_probabilities = parent_counts / len(df)
+
+parent_gini = 1 - (parent_probabilities ** 2).sum()
+
+left = df[df["Study_Hours"] <= 5]
+right = df[df["Study_Hours"] > 5]
+
+left_probabilities = left["Result"].value_counts(normalize=True)
+right_probabilities = right["Result"].value_counts(normalize=True)
+
+left_gini = 1 - (left_probabilities ** 2).sum()
+right_gini = 1 - (right_probabilities ** 2).sum()
+
+weighted_child_gini = (
+    (len(left) / len(df)) * left_gini
+    + (len(right) / len(df)) * right_gini
+)
+
+print("Parent Gini:", round(parent_gini, 2))
+print("Left Child Gini:", round(left_gini, 2))
+print("Right Child Gini:", round(right_gini, 2))
+print("Weighted Child Gini:", round(weighted_child_gini, 2))
+
+gini_gain = parent_gini - weighted_child_gini
+
+print("Parent Gini:", round(parent_gini, 2))
+print("Weighted Child Gini:", round(weighted_child_gini, 2))
+print("Gini Gain:", round(gini_gain, 2))
